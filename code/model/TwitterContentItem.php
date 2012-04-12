@@ -1,17 +1,16 @@
 <?php
 /**
- * 
  * @author Marcus Nyeholt <marcus@silverstripe.com.au>
  */
 class TwitterContentItem extends ExternalContentItem {
-
-	public static $icon = 'twitter-connector/images/tweet';
+	
+	static $icon = 'twitter-connector/images/tweet';
 
 	public function __construct($source=null, $object=null) {
 		parent::__construct($source, is_object($object) ? $object->id : $object);
 		if (is_object($object)) {
 			$createUser = isset($object->user) ? $object->user->screen_name : $object->from_user;
-			$this->remoteProperties['Title'] = sprintf(_t('TwitterConnector.CREATED_AT', '%s - tweeted at %s'), $createUser, $object->created_at);
+			$this->remoteProperties['Title'] = sprintf(_t('TwitterConnector.CREATED_AT', 'Created at %s by %s'), $object->created_at, $createUser);
 			$this->remoteProperties['CreatedBy'] = $createUser;
 			$this->remoteProperties['Tweet'] = $object->text;
 			$this->remoteProperties['Created'] = $object->created_at;

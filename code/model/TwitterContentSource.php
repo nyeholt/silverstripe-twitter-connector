@@ -7,25 +7,40 @@
  */
 class TwitterContentSource extends ExternalContentSource {
 
+	static $icon = 'twitter-connector/images/twitter';
 	public static $db = array(
 		'Query' => 'Varchar(128)',
 		'Username' => 'Varchar(64)',
 		'Password' => 'Varchar(64)',
 	);
+
 	/**
 	 *
 	 * @var TwitterClient
 	 */
 	protected $client;
 	protected $objectCache = array();
-	public static $icon = 'twitter-connector/images/twitter';
 
 	public function getCMSFields() {
 		$fields = parent::getCMSFields();
 
-		$fields->addFieldToTab('Root.Main', new TextField('Query', _t('TwitterConnector.SEARCH_QUERY', 'Search Query')));
+		$fields->addFieldToTab('Root.Main', new TextField('Query', _t('TwitterConnector.SEARCH_QUERY', 'Search Query (optional)')));
+		$fields->addFieldToTab('Root.Main', new TextField('Username', _t('ExternalContentSource.USER', 'Username')));
+		$fields->addFieldToTab('Root.Main', new TextField('Password', _t('ExternalContentSource.PASS', 'Password')));
 
 		return $fields;
+	}
+
+	/**
+	 * Return a new content importer 
+	 * @see external-content/code/dataobjects/ExternalContentSource#getContentImporter()
+	 */
+	public function getContentImporter($target=null) {
+		return new TwitterContentImporter();
+	}
+
+	public function allowedImportTargets() {
+		return array('sitetree' => true);
 	}
 
 	public function getRemoteRepository() {
@@ -55,14 +70,6 @@ class TwitterContentSource extends ExternalContentSource {
 
 	public function decodeId($id) {
 		return $id;
-	}
-
-	public function getContentImporter($target=null) {
-		return new TwitterImporter;
-	}
-
-	public function allowedImportTargets() {
-		return array('sitetree' => true);
 	}
 
 	/**
@@ -105,6 +112,7 @@ class TwitterContentSource extends ExternalContentSource {
 		if (!$this->ID) {
 			return DataObject::get('TwitterContentSource');
 		}
+
 		$children = new DataObjectSet();
 		try {
 			if ($this->Query) {
